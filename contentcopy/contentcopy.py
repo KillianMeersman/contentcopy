@@ -60,7 +60,7 @@ def difference(a: Dict, b: Dict) -> Iterator[Tuple[str, str]]:
             yield key, value
 
 
-def merge_filetrees(source: str, dest: str, file_filter=lambda x: True):
+def merge_filetrees(source: str, dest: str, file_filter=lambda x: True, dry_run=False):
     '''Merge dest into source, deduplicating files based on file content'''
 
     logger = logging.getLogger(__name__)
@@ -101,19 +101,24 @@ def merge_filetrees(source: str, dest: str, file_filter=lambda x: True):
         logger.debug('copying {} => {}'.format(fpath, dest))
 
         # create destination file and copy
-        with open(dest, 'w+'):
-            copyfile(fpath, dest)
+        if not dry_run:
+            with open(dest, 'w+'):
+                copyfile(fpath, dest)
 
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Merge two folders based on file content hash')
+        description='''
+        Merge two folders based on file content hash.
+        Files will be copied from <source> into <destination> if a file with the same content does not already exist in <destination>.
+        If a file with differing content but the same filename is encountered, the copied file will have an integer appended to its filename.
+        ''')
     parser.add_argument('source')
     parser.add_argument('destination')
     parser.add_argument('--dry-run', dest='dryrun',
-                        default=False, action='store_true')
+                        default=False, action='store_true', help="Don't copy files, log entries are still generated")
     args = parser.parse_args()
 
     logger = logging.getLogger(__name__)
@@ -131,6 +136,7 @@ if __name__ == '__main__':
     def picture_filter(x):
         return not x.endswith('.mp4')
 
-    merge_filetrees(args.source, args.destination, picture_filter)
+    merge_filetrees(args.source, args.destination,
+                    file_filter=picture_filter, dry_run=args.dryrun)
 
     logger.info('done')
