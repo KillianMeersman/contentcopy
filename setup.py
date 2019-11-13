@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="contentcopy",
-    version="1.0.0",
+    version="1.1.0",
     author="Killian Meersman",
     author_email="hi@killianm.dev",
     description="Merge directory contents, deduplicating files based on their content.",

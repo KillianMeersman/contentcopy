@@ -133,10 +133,6 @@ if __name__ == '__main__':
     ch.setFormatter(form)
     logger.addHandler(ch)
 
-    def picture_filter(x):
-        return not x.endswith('.mp4')
-
-    merge_filetrees(args.source, args.destination,
-                    file_filter=picture_filter, dry_run=args.dryrun)
+    merge_filetrees(args.source, args.destination, dry_run=args.dryrun)
 
     logger.info('done')
