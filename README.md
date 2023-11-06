@@ -1,7 +1,7 @@
-# Contentcopy
-Contentcopy merges directory contents, deduplicating files based on their content.
+# ContentCopy
+ContentCopy merges directory contents, deduplicating files based on their content.
 
-If a file with differing contents but the same name is encountered, the copied filename will automatically have a number appended, making it easy to see duplicate filenames.
+If a file with differing contents but the same name is encountered, the copied filename will automatically have a number appended, making it easy to see duplicate filenames. No folder structure will be copied.
 
 ## Usage
 ```
