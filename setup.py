@@ -1,17 +1,18 @@
 import setuptools
+import const
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="contentcopy",
-    version="1.1.0",
-    author="Killian Meersman",
-    author_email="hi@killianm.dev",
-    description="Merge directory contents, deduplicating files based on their content.",
+    name=const.NAME,
+    version=const.VERSION,
+    author=const.AUTHOR,
+    author_email=const.AUTHOR_EMAIL,
+    description=const.DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/KillianMeersman/contentcopy",
+    url=const.URL,
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

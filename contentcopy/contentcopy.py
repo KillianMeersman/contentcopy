@@ -3,6 +3,7 @@ import logging
 import os
 from shutil import copyfile
 from typing import Dict, Iterator, Tuple
+from gooey import Gooey, GooeyParser
 
 
 def hash_file_content(filepath: str) -> str:
@@ -66,57 +67,57 @@ def merge_filetrees(source: str, dest: str, file_filter=lambda x: True, dry_run=
     logger = logging.getLogger(__name__)
 
     logger.debug('indexing {}'.format(source))
-    source_index = index_file_contents(args.source, file_filter)
+    source_index = index_file_contents(source, file_filter)
 
     logger.debug('indexing {}'.format(dest))
-    destination_index = index_file_contents(args.destination, file_filter)
+    destination_index = index_file_contents(dest, file_filter)
+
 
     for fcontent, fpath in difference(destination_index, source_index):
         # split extension from filename and append to destination path
-        original_fname = fpath.rsplit('/', 1)[1]
+        original_fname = fpath.rsplit(os.path.sep, 1)[1]
         fname = original_fname
-        dest = os.path.join(args.destination, fname)
+        fdest = os.path.join(dest, fname)
 
         # check if destination file already exists,
         # if so append _<i> until a filename is available
         i = 1
         renamed = False
-        while os.path.isfile(dest):
+        while os.path.isfile(fdest):
             renamed = True
             # split the extension from the filepath
             path, extension = os.path.splitext(fpath)
 
             # split the filename from the filepath
-            fname = path.rsplit('/', 1)[1]
+            fname = path.rsplit(os.path.sep, 1)[1]
 
             # construct a new filename based on i
             fname = '{}_{}{}'.format(fname, i, extension)
-            dest = os.path.join(args.destination, fname)
+            fdest = os.path.join(dest, fname)
             i += 1
 
         if renamed:
             logger.debug('file exists, renaming {} to {}'.format(
                 original_fname, fname))
 
-        logger.debug('copying {} => {}'.format(fpath, dest))
+        logger.debug('copying {} => {}'.format(fpath, fdest))
 
         # create destination file and copy
         if not dry_run:
-            with open(dest, 'w+'):
-                copyfile(fpath, dest)
-
-
-if __name__ == '__main__':
+            with open(fdest, 'w+'):
+                copyfile(fpath, fdest)
+@Gooey
+def main():
     import argparse
-
-    parser = argparse.ArgumentParser(
+    parser = GooeyParser(
+    # parser = argparse.ArgumentParser(
         description='''
-        Merge two folders based on file content hash.
-        Files will be copied from <source> into <destination> if a file with the same content does not already exist in <destination>.
-        If a file with differing content but the same filename is encountered, the copied file will have an integer appended to its filename.
-        ''')
-    parser.add_argument('source')
-    parser.add_argument('destination')
+Merge two folders based on file content hash.
+Files will be copied from <source> into <destination> if a file with the same content does not already exist in <destination>.
+If a file with differing content but the same filename is encountered, the copied file will have an integer appended to its filename.
+''')
+    parser.add_argument('source', widget="DirChooser")
+    parser.add_argument('destination', widget="DirChooser")
     parser.add_argument('--dry-run', dest='dryrun',
                         default=False, action='store_true', help="Don't copy files, log entries are still generated")
     args = parser.parse_args()
@@ -136,3 +137,6 @@ if __name__ == '__main__':
     merge_filetrees(args.source, args.destination, dry_run=args.dryrun)
 
     logger.info('done')
+
+if __name__ == '__main__':
+    main()
